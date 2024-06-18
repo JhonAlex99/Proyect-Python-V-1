@@ -56,7 +56,7 @@ def baja(tabla):
     # Tabla banco
         if tabla == "Entidades Bancarias":
             iban = input("Escriba el número de cuenta (IBAN) del banco a eliminar: ")
-            sql = "DELETE FROM bancos WHERE codigo_iban = %s"
+            sql = "DELETE FROM bancos WHERE iban = %s"
             valores = (iban,)
             cursor.execute(sql, valores)
             conexion.commit()
@@ -65,7 +65,7 @@ def baja(tabla):
     # Tabla dirección de envío
         if tabla == "Direcciones de Envío":
             codigoPosenvio = input("Escriba el código postal de envío a eliminar: ")
-            sql = "DELETE FROM direccionenvio WHERE codigo_postal = %s"
+            sql = "DELETE FROM direccion_envio WHERE codigo_postal = %s"
             valores = (codigoPosenvio,)
             cursor.execute(sql, valores)
             conexion.commit()
