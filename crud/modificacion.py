@@ -11,73 +11,72 @@ def modificacion(tabla):
     cursor = conexion.cursor()
     #Clientes
     if tabla == "Clientes":
-        id_cliente = input("Ingrese el ID del cliente a modificar: ")
+        codigo_cliente = input("Ingrese el código del cliente a modificar: ")
         nombre = input("Ingrese el nombre del cliente: ")
         apellido = input("Ingrese el apellido del cliente: ")
-        nif = input("Introduce tu Nif/Nie: ")
-        direccion = input("Introduce tu dirección: ")
-        codigoPostal = input("Introduce tu codigo postal: ")
-        provincia = input("Introduce tu provinica: ")
+        codigo_postal = input("Modifique su código postal: ")
+        cif_nie = input("Introduce tu Nif/Nie: ")
+    
 
-        sql = "UPDATE Clientes SET nombre = %s, apellido = %s, nif_nie = %s, direccion = %s, codigopostal = %s, provincia = %s WHERE id = %s"
-        valores = (nombre, apellido, nif, direccion, codigoPostal, provincia, id_cliente)
+        sql = "UPDATE clientes SET nombre = %s, apellido = %s, codigo_postal = %s, cif_nie = %s WHERE codigo_cliente = %s"
+        valores = (codigo_cliente,nombre, apellido, codigo_postal, cif_nie)
         cursor.execute(sql, valores)
         conexion.commit()
         print("Cliente modificado exitosamente.")
     #Codigo Postal
     if tabla == "Codigo Postal":
-        id_codigo_postal = input("Ingrese el ID del código postal a modificar: ")
-        codigo = input("Escriba un código postal: ")
-        descripcion = input("Escriba una descripción: ")
+        codigo_de_codigo_postal = input("Escriba el código postal a modificar: ")
+        descripcion = input("Escriba su nueva dirección: ")
 
-        sql = "UPDATE CodigosPostales SET codigo = %s, descripcion = %s WHERE id = %s"
-        valores = (codigo, descripcion, id_codigo_postal)
+        sql = "UPDATE codigo_postal SET descripcion = %s WHERE codigo = %s"
+        valores = ( descripcion, codigo_de_codigo_postal)
         cursor.execute(sql, valores)
         conexion.commit()
         print("Código postal modificado exitosamente.")
     #Poblacion
     if tabla == "Poblacion":
-        id_poblacion = input("Ingrese el ID de la población a modificar: ")
-        codigoP = input("Escriba un código postal: ")
-        descripcionP = input("Escriba una descripción: ")
+        codigo_poblacion = input("Escriba el código de población a modificar: ")
+        descripcion_poblacion = input("Escriba su nueva población: ")
 
-        sql = "UPDATE Poblaciones SET codigo = %s, descripcion = %s WHERE id = %s"
-        valores = (codigoP, descripcionP, id_poblacion)
+        sql = "UPDATE poblaciones SET  descripcion = %s WHERE  codigo = %s"
+        valores = (descripcion_poblacion, codigo_poblacion)
         cursor.execute(sql, valores)
         conexion.commit()
         print("Población modificada exitosamente.")
     #Provincias
     if tabla == "Provincias":
-        id_provincia = input("Ingrese el ID de la provincia a modificar: ")
-        codigoPro = input("Escriba un código postal: ")
-        descripcionPro = input("Escriba una descripción: ")
+        
+        codigo_provincia = input("Escriba el código de provincia a modificar: ")
+        descripcion_provincia = input("Escriba su nueva provincia: ")
 
-        sql = "UPDATE Provincias SET codigo = %s, descripcion = %s WHERE id = %s"
-        valores = (codigoPro, descripcionPro, id_provincia)
+        sql = "UPDATE provincias SET descripcion = %s WHERE codigo = %s"
+        valores = ( descripcion_provincia, codigo_provincia)
         cursor.execute(sql, valores)
         conexion.commit()
         print("Provincia modificada exitosamente.")
     #Entidades Bancarias
     if tabla == "Entidades Bancarias":
-        id_banco = input("Ingrese el ID del banco a modificar: ")
-        nombreBanco = input("Escriba el nombre de su banco: ")
-        iban = input("Escriba el número de cuenta: ")
-        swift = input("Escriba el código internacional: ")
+        codigo_banco = input("Ingrese el código del banco a modificar: ")
+        iban = input("Escriba su nuevo número de cuenta: ")
+        nombre_banco = input("Escriba su nuevo nombre del banco: ")
+        swift = input("Escriba su nuevo código internacional: ")
 
-        sql = "UPDATE Bancos SET nombre_entidad = %s, codigo_iban = %s, codigo_swift = %s WHERE id = %s"
-        valores = (nombreBanco, iban, swift, id_banco)
+        sql = "UPDATE bancos SET  iban = %s, nombre_banco = %s, swift_bci = %s WHERE codigo_banco = %s"
+        valores = (iban, nombre_banco, swift, codigo_banco)
         cursor.execute(sql, valores)
         conexion.commit()
         print("Banco modificado exitosamente.")
     #Direccion de envío
     if tabla == "Direcciones de Envío":
-        id_direccion_envio = input("Ingrese el ID de la dirección de envío a modificar: ")
-        codigoPosenvio = input("Escriba el código postal de envío: ")
-        poblacionenvio = input("Escriba la población de envío: ")
-        provinciaenvio = input("Escriba la provincia de envío: ")
+        codigo_cliente_envio = input("Ingrese el código del cliente de la dirección de envío a modificar: ")
+        direccion_envio = input("Modifique su dirección de envío: ")
+        codigo_postal_envio = input("Modifique su código postal de envío: ")
+        nombre_cliente_envio = input("Escriba el nombre de la persona que recibe su envío: ")
+        poblacion_envio = input("Introduzca o modifque el código postal de su población")
+        provincia_envio = input("Introduzca o Modifique los dos digitos de su provincia")
 
-        sql = "UPDATE DireccionesEnvio SET codigo_postal = %s, poblacion = %s, provincia = %s WHERE id = %s"
-        valores = (codigoPosenvio, poblacionenvio, provinciaenvio, id_direccion_envio)
+        sql = "UPDATE direccion_envio SET direccion_envio = %s, codigo_postal = %s, nombre_cliente = %s, poblacion = %s, provincia = %s WHERE codigo_cliente = %s"
+        valores = (direccion_envio,codigo_postal_envio,nombre_cliente_envio,poblacion_envio,provincia_envio,codigo_cliente_envio)
         cursor.execute(sql, valores)
         conexion.commit()
         print("Dirección de envío modificada exitosamente.")
