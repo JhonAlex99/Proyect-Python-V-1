@@ -13,11 +13,11 @@ from alta import alta
 from modificacion import modificacion
 from baja import baja
 from consulta import consultas
-""" 
+
 ruta_facturacion = os.path.abspath(os.path.join(os.path.dirname(__file__),"..","facturacion"))
 sys.path.append(ruta_facturacion)
 
-from facturacion import facturacion """
+from facturar import facturar1
 
 """ 
 ruta_impresion = os.path.abspath(os.path.join(os.path.dirname(__file__),"..","impresion"))
@@ -38,6 +38,8 @@ def menu_principal():
         
         if opcion == "1":
             menu_mantenimiento()
+        if opcion == "2":
+            facturar1()    
         
         if opcion == "4":
             print("Saliendo del programa...")
