@@ -6,7 +6,7 @@ from conexion import cerrar, obtener_conexion
 
 def obtener_datos_empresa():
     conexion = obtener_conexion()
-    cursor = conexion.cursor()
+    cursor = conexion.cursor(buffered=True)
     sql = """
         SELECT e.nombre_vendedor, e.apellidos_vendedor, p.descripcion, pr.descripcion, e.cif_nie_vendedor, e.codigo_postal_empresa, e.codigo_banco
         FROM empresa e
@@ -30,7 +30,7 @@ def obtener_datos_empresa():
 
 def obtener_datos_cliente(codigo_cliente):
     conexion = obtener_conexion()
-    cursor = conexion.cursor()
+    cursor = conexion.cursor(buffered=True)
     sql = """
         SELECT c.nombre, c.apellido, p.descripcion, c.cif_nie
         FROM clientes c
@@ -54,7 +54,7 @@ def obtener_datos_cliente(codigo_cliente):
 
 def obtener_precio_unitario_y_nombre(producto):
     conexion = obtener_conexion()
-    cursor = conexion.cursor()
+    cursor = conexion.cursor(buffered=True)
     sql = "SELECT nombre_producto, valor_producto FROM productos WHERE codigo_producto = %s"
     cursor.execute(sql, (producto,))
     resultado = cursor.fetchone()
@@ -96,7 +96,7 @@ def calcular_total_general(productos):
 
 def obtener_numero_factura():
     conexion = obtener_conexion()
-    cursor = conexion.cursor()
+    cursor = conexion.cursor(buffered=True)
     sql = "SELECT MAX(numero_factura) FROM cabecera, lineas"
     cursor.execute(sql)
     resultado = cursor.fetchone()
@@ -107,19 +107,78 @@ def obtener_numero_factura():
     else:
         return 1
 
+def obtener_codigo_banco():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(buffered=True)
+    sql = "SELECT codigo_banco, iban, nombre_banco, swift_bci FROM bancos WHERE por_defecto = 1"
+    cursor.execute(sql)
+    resultado = cursor.fetchone()
+    cursor.close()
+    conexion.close()
+    if resultado:
+        return {
+            "codigo_banco": resultado[0],
+            "iban": resultado[1],
+            "nombre_banco": resultado[2],
+            "swift_bci": resultado[3]
+        }
+    else:
+        print("No se encontró ningún banco en la base de datos.")
+        return None
+
+def obtener_datos_envio(codigo_cliente=None):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(buffered=True)
+
+    if codigo_cliente:
+        sql = """
+            SELECT direccion_envio, codigo_postal, nombre_cliente, poblacion, provincia
+            FROM direccion_envio
+            WHERE por_defecto = '1' AND codigo_cliente = %s
+        """
+        cursor.execute(sql, (codigo_cliente,))
+    else:
+        sql = """
+            SELECT direccion_envio, codigo_postal, nombre_cliente, poblacion, provincia
+            FROM direccion_envio
+            WHERE por_defecto = '1'
+        """
+        cursor.execute(sql)
+
+    resultado = cursor.fetchone()  # Obtener solo una fila de resultado
+
+    cursor.close()
+    conexion.close()
+
+    if resultado:
+        return {
+            "direccion_envio": resultado[0],
+            "codigo_postal": resultado[1],
+            "nombre_cliente": resultado[2],
+            "poblacion": resultado[3],
+            "provincia": resultado[4]
+        }
+    else:
+        if codigo_cliente:
+            print(f"No se encontró dirección de envío para el cliente con código {codigo_cliente}.")
+        else:
+            print("No se encontró dirección de envío por defecto en la base de datos.")
+        return None
+
 def guardar_factura(cabecera, lineas):
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
     sql_cabecera = """
         INSERT INTO cabecera (numero_factura, codigo_cliente, codigo_postal, nombre_cliente, poblacion_cliente, provincia_cliente, fecha, importe_producto, total_factura, iban, nombre_banco,
-        nombre_vendedor, apellidos_vendedor, poblacion_empresa, provincia_empresa, cif_nie_vendedor, codigo_postal_empresa, codigo_banco)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        nombre_vendedor, apellidos_vendedor, poblacion_empresa, provincia_empresa, cif_nie_vendedor, codigo_postal_empresa, codigo_banco, swift_bci, direccion_envio, codigo_postal_envio, nombre_cliente_envio, poblacion_envio, provincia_envio)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     cursor.execute(sql_cabecera, (
         cabecera["numero_factura"], cabecera["codigo_cliente"], cabecera["codigo_postal"], cabecera["nombre_cliente"], cabecera["poblacion_cliente"], cabecera["provincia_cliente"], cabecera["fecha"], cabecera["importe_producto"], cabecera["total_factura"],
         cabecera["iban"], cabecera["nombre_banco"], cabecera["nombre_vendedor"], cabecera["apellidos_vendedor"], cabecera["poblacion_empresa"], cabecera["provincia_empresa"],
-        cabecera["cif_nie_vendedor"], cabecera["codigo_postal_empresa"], cabecera["codigo_banco"]
+        cabecera["cif_nie_vendedor"], cabecera["codigo_postal_empresa"], cabecera["codigo_banco"], cabecera["swift_bci"],cabecera["direccion_envio"], cabecera["codigo_postal_envio"],
+        cabecera["nombre_cliente_envio"],cabecera["poblacion_envio"],cabecera["provincia_envio"]
     ))
 
     sql_lineas = """
@@ -144,13 +203,20 @@ def guardar_factura(cabecera, lineas):
     cursor.close()
     conexion.close()
     return numero_factura_insertado
+
 def facturar1():
     
     datos_empresa = obtener_datos_empresa()
+    codigo_banco = obtener_codigo_banco()
+    if not codigo_banco:
+        return  # Si no se encuentra ningún banco, termina la ejecución
+        
     codigo_cliente = input("Introduce el código del cliente: ")
     datos_cliente = obtener_datos_cliente(codigo_cliente)
     if datos_cliente is None:
         return  # Si el cliente no se encuentra, termina la ejecución
+    
+    datos_envio = obtener_datos_envio(codigo_cliente)
 
     fecha_factura = datetime.now().strftime("%Y-%m-%d")
     productos = obtener_datos_productos()
@@ -173,15 +239,21 @@ def facturar1():
         "fecha": fecha_factura,
         "importe_producto": total_general,
         "total_factura": total_con_iva,
-        "iban": "IBAN123456789",  # Reemplaza con el valor correspondiente
-        "nombre_banco": "Banco de Ejemplo",  # Reemplaza con el valor correspondiente
+        "iban": codigo_banco["iban"],  
+        "nombre_banco": codigo_banco["nombre_banco"],  
         "nombre_vendedor": datos_empresa["nombre_vendedor"],
         "apellidos_vendedor": datos_empresa["apellidos_vendedor"],
         "poblacion_empresa": datos_empresa["poblacion"],
         "provincia_empresa": datos_empresa["provincia"],
         "cif_nie_vendedor": datos_empresa["cif_nie_vendedor"],
         "codigo_postal_empresa": datos_empresa["codigo_postal_empresa"],
-        "codigo_banco": datos_empresa["codigo_banco"]
+        "codigo_banco": codigo_banco["codigo_banco"],
+        "swift_bci" : codigo_banco["swift_bci"],
+        "direccion_envio" : datos_envio["direccion_envio"],
+        "codigo_postal_envio" : datos_envio["codigo_postal"],
+        "nombre_cliente_envio" : datos_envio["nombre_cliente"],
+        "poblacion_envio" : datos_envio["poblacion"],
+        "provincia_envio" : datos_envio["provincia"],
     }
     
 
@@ -196,6 +268,10 @@ def facturar1():
 
     print("\nDatos del Cliente:")
     for key, value in datos_cliente.items():
+        print(f"{key}: {value}")
+
+    print("\nDatos del Envio:")
+    for key, value in datos_envio.items():
         print(f"{key}: {value}")
 
     print("\nLíneas de Factura:")

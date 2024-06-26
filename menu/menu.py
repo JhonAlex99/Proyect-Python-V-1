@@ -19,15 +19,26 @@ sys.path.append(ruta_facturacion)
 
 from facturar import facturar1
 
-""" 
+
 ruta_impresion = os.path.abspath(os.path.join(os.path.dirname(__file__),"..","impresion"))
 sys.path.append(ruta_impresion)
 
-from impresion import imprimir """
+from impresion import imprimir,generar_pdf
+
+
+
+def limpiar_pantalla():
+    # Función para limpiar la pantalla
+    if os.name == 'nt':  # Para Windows
+        os.system('cls')
+    else:  # Para Unix/Linux/MacOS
+        os.system('clear')
+
 
 # Función para mostrar el menú principal
 def menu_principal():
     while True:
+        limpiar_pantalla()
         print("\nMenú Principal:")
         print("1. Mantenimiento")
         print("2. Facturación")
@@ -38,10 +49,17 @@ def menu_principal():
         
         if opcion == "1":
             menu_mantenimiento()
-        if opcion == "2":
-            facturar1()    
-        
-        if opcion == "4":
+        elif opcion == "2":
+            facturar1()   
+        elif opcion == "3":
+            numero_factura = input("Ingrese el numero de la factura")
+            cabecera, lineas = imprimir(numero_factura)
+            if cabecera and lineas:
+                generar_pdf(cabecera, lineas, numero_factura)
+            else:
+                print("No se encontro la factura mencionada")
+
+        elif opcion == "4":
             print("Saliendo del programa...")
             break
         else:
@@ -50,6 +68,7 @@ def menu_principal():
 # Función para mostrar el menú de mantenimiento
 def menu_mantenimiento():
     while True: 
+        limpiar_pantalla()
         print("\nMenú Mantenimiento:")
         print("1. Clientes")
         print("2. Codigo Postal")
@@ -57,7 +76,8 @@ def menu_mantenimiento():
         print("4. Provincias")
         print("5. Entidades Bancarias")
         print("6. Direcciones de Envío")
-        print("7. Volver al Menú Principal")
+        print("7. Listado de Facturas")
+        print("8. Volver al Menú Principal")
 
         opcion = input("Seleccione una opción: ")
         
@@ -74,6 +94,8 @@ def menu_mantenimiento():
         if opcion == "6":
             submenu_tabla("Direcciones de Envío")
         if opcion == "7":
+            submenu_tabla("Listado de Facturas")
+        if opcion == "8":
             break
         else:
             print("Opción inválida. Por favor, seleccione una opción válida.")
@@ -81,6 +103,7 @@ def menu_mantenimiento():
 # Función para mostrar el submenú de una tabla específica
 def submenu_tabla(tabla):
     while True:
+        limpiar_pantalla()
         print(f"\nMenú {tabla}:")
         print("1. Alta")
         print("2. Baja")

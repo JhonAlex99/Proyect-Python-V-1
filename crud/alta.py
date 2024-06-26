@@ -18,9 +18,9 @@ def alta(tabla):
 
         # Tabla Clientes
         if tabla == "Clientes":
-            nombre = input("Ingrese el nombre del cliente: ")
-            apellido = input("Ingrese el apellido del cliente: ")
-            codigo_postal = input("Introduce tu código postal: ")
+            nombre = input("Nombre : ")
+            apellido = input("Apellido : ")
+            codigo_postal = input("Código postal : ")
             cif_nie = input("Introduce tu NIF/NIE: ")
  
 
@@ -32,8 +32,8 @@ def alta(tabla):
 
         # Tabla Código Postal
         if tabla == "Codigo Postal":
-            codigo = input("Escriba un código postal: ")
-            descripcion = input("Escriba una descripción: ")
+            codigo = input("Código postal: ")
+            descripcion = input("Descripción: ")
 
             sql = "INSERT INTO codigo_postal (codigo, descripcion) VALUES (%s, %s)"
             val = (codigo, descripcion)
@@ -43,8 +43,8 @@ def alta(tabla):
 
         # Tabla Población
         if tabla == "Poblacion":
-            codigo = input("Escriba un código postal: ")
-            descripcion = input("Escriba una descripción: ")
+            codigo = input("Código postal: ")
+            descripcion = input("Descripción: ")
 
             sql = "INSERT INTO poblaciones (codigo, descripcion) VALUES (%s, %s)"
             val = (codigo, descripcion)
@@ -55,7 +55,7 @@ def alta(tabla):
         # Tabla Provincias
         if tabla == "Provincias":
             codigo = input("Codigo de provincia: ")
-            descripcion = input("Escriba una descripción: ")
+            descripcion = input("Descripción: ")
 
             sql = "INSERT INTO provincias (codigo, descripcion) VALUES (%s, %s)"
             val = (codigo, descripcion)
@@ -65,28 +65,37 @@ def alta(tabla):
 
         # Tabla Banco
         if tabla == "Entidades Bancarias":
-            codigo_banco = input("escriba el codigo de su banco: ")
-            iban = input("Escriba el número de cuenta: ")
-            nombre_banco = input("Introduce el nombre de tu banco: ")
-            swift_bci = input("Escriba el código internacional: ")
+            codigo_banco = input("Código de su banco: ")
+            iban = input("Número de cuenta: ")
+            nombre_banco = input("Nombre banco: ")
+            swift_bci = input("Código internacional: ")
 
-            sql = "INSERT INTO bancos (codigo_banco , iban, nombre_banco, swift_bci) VALUES (%s, %s, %s, %s)"
-            val = (codigo_banco,iban,nombre_banco, swift_bci)
+            sql_update = "UPDATE bancos SET por_defecto = 0 WHERE codigo_banco = %s"
+            cursor.execute(sql_update, (codigo_banco,))
+
+            sql = "INSERT INTO bancos (codigo_banco , iban, nombre_banco, swift_bci, por_defecto) VALUES (%s, %s, %s, %s, %s)"
+            val = (codigo_banco,iban,nombre_banco, swift_bci, 1)
             cursor.execute(sql, val)
             conexion.commit()
             print("Datos introducidos correctamente.")
 
         # Tabla Dirección Envío
         if tabla == "Direcciones de Envío":
-            codigo_cliente_de_envio = input("Escriba el código de cliente : ")
-            direccion_envio = input("Escriba la dirección de envío: ")
-            codigo_postal_de_envio = input("Escriba el código postal de envío: ")
+            codigo_cliente_de_envio = input("Código de cliente : ")
+            direccion_envio = input("Dirección de envío: ")
+            codigo_postal_de_envio = input("Código postal de envío: ")
             nombre_cliente = input("Nombre Cliente: ")
             poblacion_envio = input("Ingrese sus digitos de poblacion de envío: ")
             provincia_envio = input("Ingrese sus digitos de provincia de envío: ")
 
-            sql = "INSERT INTO direccion_envio (codigo_cliente, direccion_envio, codigo_postal, nombre_cliente, poblacion, provincia) VALUES (%s, %s, %s , %s , %s , %s)"
-            val = (codigo_cliente_de_envio, direccion_envio, codigo_postal_de_envio,nombre_cliente,poblacion_envio,provincia_envio)
+              # Establecer todas las direcciones anteriores del cliente a por_defecto = 0
+            sql_update = "UPDATE direccion_envio SET por_defecto = 0 WHERE codigo_cliente = %s"
+            cursor.execute(sql_update, (codigo_cliente_de_envio,))
+
+    # Insertar la nueva dirección con por_defecto = 1
+
+            sql = "INSERT INTO direccion_envio (codigo_cliente, direccion_envio, codigo_postal, nombre_cliente, poblacion, provincia, por_defecto) VALUES (%s, %s, %s , %s , %s , %s, %s)"
+            val = (codigo_cliente_de_envio, direccion_envio, codigo_postal_de_envio,nombre_cliente,poblacion_envio,provincia_envio,1)
             cursor.execute(sql, val)
             conexion.commit()
             print("Datos introducidos correctamente.")

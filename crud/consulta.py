@@ -64,6 +64,15 @@ def consultas(tabla):
             for direccion in resultado:
                 print(f"Código Cliente: {direccion[0]}, Dirección de Envío: {direccion[1]}, Código Postal: {direccion[2]}, Nombre del Cliente: {direccion[3]}, Código-Población: {direccion[4]}, Código-Provincia: {direccion[5]}")
 
+        
+# Tabla Cabecera y Líneas
+        if tabla == "Listado de Facturas":
+            sql = " SELECT * FROM cabecera"
+            cursor.execute(sql)
+            resultado = cursor.fetchall()
+            print(resultado)
+ 
+
     except Exception as e:
         print("Error al consultar datos: ", e)
     finally:
