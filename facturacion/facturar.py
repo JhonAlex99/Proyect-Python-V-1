@@ -132,16 +132,23 @@ def obtener_datos_envio(codigo_cliente=None):
 
     if codigo_cliente:
         sql = """
-            SELECT direccion_envio, codigo_postal, nombre_cliente, poblacion, provincia
-            FROM direccion_envio
-            WHERE por_defecto = '1' AND codigo_cliente = %s
+            SELECT de.direccion_envio, de.codigo_postal, de.nombre_cliente, p.descripcion, prov.descripcion
+            FROM direccion_envio de
+            JOIN codigo_postal cp ON de.codigo_postal = cp.codigo
+            JOIN poblaciones p ON de.poblacion = p.codigo
+            JOIN provincias prov ON de.provincia = prov.codigo
+            WHERE de.por_defecto = '1' AND de.codigo_cliente = %s
+        
         """
         cursor.execute(sql, (codigo_cliente,))
     else:
         sql = """
-            SELECT direccion_envio, codigo_postal, nombre_cliente, poblacion, provincia
-            FROM direccion_envio
-            WHERE por_defecto = '1'
+            SELECT de.direccion_envio, de.codigo_postal, de.nombre_cliente, p.descripcion, prov.descripcion
+            FROM direccion_envio de
+            JOIN codigo_postal cp ON de.codigo_postal = cp.codigo
+            JOIN poblaciones p ON de.poblacion = p.codigo
+            JOIN provincias prov ON de.provincia = prov.codigo
+            WHERE de.por_defecto = '1' AND de.codigo_cliente = %s
         """
         cursor.execute(sql)
 

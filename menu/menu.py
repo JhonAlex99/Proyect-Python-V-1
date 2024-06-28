@@ -26,19 +26,10 @@ sys.path.append(ruta_impresion)
 from impresion import imprimir,generar_pdf
 
 
-
-def limpiar_pantalla():
-    # Función para limpiar la pantalla
-    if os.name == 'nt':  # Para Windows
-        os.system('cls')
-    else:  # Para Unix/Linux/MacOS
-        os.system('clear')
-
-
 # Función para mostrar el menú principal
 def menu_principal():
     while True:
-        limpiar_pantalla()
+       
         print("\nMenú Principal:")
         print("1. Mantenimiento")
         print("2. Facturación")
@@ -52,6 +43,7 @@ def menu_principal():
         elif opcion == "2":
             facturar1()   
         elif opcion == "3":
+            
             numero_factura = input("Ingrese el numero de la factura")
             cabecera, lineas = imprimir(numero_factura)
             if cabecera and lineas:
@@ -68,7 +60,7 @@ def menu_principal():
 # Función para mostrar el menú de mantenimiento
 def menu_mantenimiento():
     while True: 
-        limpiar_pantalla()
+     
         print("\nMenú Mantenimiento:")
         print("1. Clientes")
         print("2. Codigo Postal")
@@ -103,7 +95,7 @@ def menu_mantenimiento():
 # Función para mostrar el submenú de una tabla específica
 def submenu_tabla(tabla):
     while True:
-        limpiar_pantalla()
+       
         print(f"\nMenú {tabla}:")
         print("1. Alta")
         print("2. Baja")
